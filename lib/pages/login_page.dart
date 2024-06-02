@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:full_shop/components/my_button.dart';
 import 'package:full_shop/components/my_textfield.dart';
-import 'package:full_shop/pages/home_page.dart';
+import 'package:full_shop/services/auth/auth_service.dart';
 
 class Loginpage extends StatefulWidget {
   final void Function()? onTap;
@@ -19,11 +19,20 @@ class _LoginpageState extends State<Loginpage> {
 
   final TextEditingController passwordController = TextEditingController();
 
-  void login() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const Homepage()),
-    );
+  void login() async {
+   final _authService = AuthService();
+
+   // try sign in
+  try {
+    await _authService.signInWithEmailAndPassword(emailController.text, passwordController.text);
+  } catch (e) {
+    showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(e.toString()),
+          ),
+        );
+  }
   }
 
   @override

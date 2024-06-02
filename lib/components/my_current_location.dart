@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:full_shop/models/restaurant.dart';
+import 'package:provider/provider.dart';
 
 class MyCurrentLocation extends StatelessWidget {
-  const MyCurrentLocation({super.key});
+   MyCurrentLocation({super.key});
+  TextEditingController textController = TextEditingController();
 
   void openLocationSearchBox(BuildContext context) {
     showDialog(
@@ -11,7 +14,8 @@ class MyCurrentLocation extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Text('Your location'),
         content: TextField(
-          decoration: InputDecoration(hintText: 'Search address'),
+          controller: textController,
+          decoration: InputDecoration(hintText: 'Enter address'),
         ),
         actions: [
           //cancel
@@ -22,7 +26,13 @@ class MyCurrentLocation extends StatelessWidget {
 
           //save
           MaterialButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context);
+              // update new address
+              String newAddress = textController.text;
+              context.read<Restaurant>().updateDeliveryAddress(newAddress);
+              textController.clear();
+            },
             child: Text('Save'),
           ),
         ],
@@ -33,7 +43,8 @@ class MyCurrentLocation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 25.0, bottom: 25, right: 25, top: 15),
+      padding:
+          const EdgeInsets.only(left: 25.0, bottom: 25, right: 25, top: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -46,11 +57,13 @@ class MyCurrentLocation extends StatelessWidget {
             child: Row(
               children: [
                 // Address
-                Text(
-                  'Port Harcout',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                      fontWeight: FontWeight.bold),
+                Consumer<Restaurant>(
+                  builder: (context, restaurant, child) => Text(
+                    restaurant.deliveryAddress,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
 
                 // drop down menu

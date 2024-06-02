@@ -1,6 +1,9 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:full_shop/components/my_button.dart';
 import 'package:full_shop/components/my_textfield.dart';
+import 'package:full_shop/services/auth/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
@@ -12,11 +15,36 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+
+  void register() {
+    final _authService = AuthService();
+
+    // password match -> create user
+    if (passwordController.text == confirmPasswordController.text) {
+      try {
+        _authService.signUpWithEmailAndPassword(
+            emailController.text, passwordController.text);
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(e.toString()),
+          ),
+        );
+      }
+    }else{
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Passwords don't match"),
+          ),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
               obscureText: true,
             ),
 
-             const SizedBox(
+            const SizedBox(
               height: 10,
             ),
 
@@ -82,7 +110,7 @@ class _RegisterPageState extends State<RegisterPage> {
             // sign in button
             MyButton(
               text: 'Sign Up',
-              onTap: () {},
+              onTap: register,
             ),
             const SizedBox(
               height: 25,

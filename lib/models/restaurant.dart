@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:full_shop/models/cart_item.dart';
 import 'package:full_shop/models/food.dart';
+import 'package:intl/intl.dart';
 
 class Restaurant with ChangeNotifier {
   // list of food menu
@@ -215,9 +216,16 @@ class Restaurant with ChangeNotifier {
         ]),
   ];
 
+
+
+  // delivery address
+  String _deliveryAddress = '100 unit, udo udoma, uyo';
+
   // Getters
 
   List<Food> get menu => _menu;
+  List<CartItem> get cart => _cart;
+  String get deliveryAddress => _deliveryAddress;
 
   // OPERATIONS
 
@@ -251,13 +259,13 @@ class Restaurant with ChangeNotifier {
   }
 
   // remove from cart
-  void removerFromCart(CartItem cartItem){
+  void removerFromCart(CartItem cartItem) {
     int cartIndex = _cart.indexOf(cartItem);
 
-    if(cartIndex != -1){
-      if(_cart[cartIndex].quantity > 1) {
+    if (cartIndex != -1) {
+      if (_cart[cartIndex].quantity > 1) {
         _cart[cartIndex].quantity--;
-      }else{
+      } else {
         _cart.remove(cartIndex);
       }
     }
@@ -268,10 +276,10 @@ class Restaurant with ChangeNotifier {
   double getTotalPrice() {
     double total = 0.0;
 
-    for(CartItem cartItem in _cart){
+    for (CartItem cartItem in _cart) {
       double itemTotal = cartItem.food.price;
 
-      for (Addon addon in cartItem.selectedAddons){
+      for (Addon addon in cartItem.selectedAddons) {
         itemTotal = addon.price;
       }
       total += itemTotal * cartItem.quantity;
@@ -280,10 +288,10 @@ class Restaurant with ChangeNotifier {
   }
 
   // get total number of items in cart
-  int getTotalItemCount(){
+  int getTotalItemCount() {
     int totalItemCount = 0;
 
-    for (CartItem cartItem in _cart){
+    for (CartItem cartItem in _cart) {
       totalItemCount = cartItem.quantity;
     }
 
@@ -291,16 +299,60 @@ class Restaurant with ChangeNotifier {
   }
 
   // clear cart
-  void clearCart(){
+  void clearCart() {
     _cart.clear();
+    notifyListeners();
+  }
+
+  // update delivery address
+  void updateDeliveryAddress(String newAddress){
+    _deliveryAddress = newAddress;
     notifyListeners();
   }
 
   // HELPERS
 
   // generate a receipt
+  String displayCartReceipt() {
+    final receipt = StringBuffer();
+    receipt.writeln("Here's your receipt.");
+    receipt.writeln();
+
+    // format date to include up to seconds omly
+    String formattedDate =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+    receipt.writeln(formattedDate);
+    receipt.writeln();
+    receipt.writeln("---------------");
+
+    for (final cartItem in _cart) {
+      receipt.writeln(
+          "${cartItem.quantity} x ${cartItem.food.name} - ${_formatPrice(cartItem.food.price)}");
+
+      if (cartItem.selectedAddons.isNotEmpty) {
+        receipt.writeln("  Add-ons: ${_formatAddons(cartItem.selectedAddons)}");
+      }
+      receipt.writeln();
+    }
+    receipt.writeln("--------");
+    receipt.writeln();
+    receipt.writeln("Total items: ${getTotalItemCount()}");
+    receipt.writeln("Total price: ${_formatPrice(getTotalPrice())}");
+    receipt.writeln("Delivering to: $deliveryAddress");
+
+    return receipt.toString();
+  }
 
   // format double value into money
+  String _formatPrice(double price) {
+    return "\$${price.toStringAsFixed(2)}";
+  }
 
   //format list of addons into a string summary
+  String _formatAddons(List<Addon> addons) {
+    return addons
+        .map((addon) => "${addon.name} (${_formatPrice(addon.price)})")
+        .join(", ");
+  }
 }

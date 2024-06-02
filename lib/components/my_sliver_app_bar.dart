@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:full_shop/pages/cart_page.dart';
 
 class MySliverAppBar extends StatelessWidget {
   final Widget child;
@@ -14,10 +15,27 @@ class MySliverAppBar extends StatelessWidget {
       collapsedHeight: 120,
       floating: false,
       pinned: true,
-      actions: [IconButton(onPressed: () {}, icon: Icon(Icons.shopping_cart))],
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CartPage(),
+              ),
+            );
+          },
+          icon: Icon(Icons.shopping_cart),
+        ),
+      ],
       backgroundColor: Theme.of(context).colorScheme.background,
       foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-      title: Text('Sunset Diner', style: TextStyle(fontFamily: 'Poetsen One',),),
+      title: Text(
+        'Sunset Diner',
+        style: TextStyle(
+          fontFamily: 'Poetsen One',
+        ),
+      ),
       flexibleSpace: FlexibleSpaceBar(
         background: Padding(
           padding: const EdgeInsets.only(bottom: 50.0),
@@ -26,7 +44,6 @@ class MySliverAppBar extends StatelessWidget {
         title: title,
         centerTitle: true,
         titlePadding: EdgeInsets.only(left: 0, right: 0, top: 0),
-        
       ),
     );
   }
